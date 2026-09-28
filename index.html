@@ -1,1 +1,188 @@
-
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Braid anyons, fill orders — a non-commuting factory puzzle. Made for Quantum Game Jam 2026.">
+<title>Braid Works — Quantum Game Jam 2026</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230e7c86'/%3E%3Cpath d='M14 20c12 0 24 24 36 24M14 44c12 0 24-24 36-24' stroke='%23fff' stroke-width='7' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#e7ecef;--panel:#f7f9fa;--ink:#14202a;--mut:#5b6b77;--acc:#0e7c86;--line:#cbd5dc;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1418;--panel:#172027;--ink:#dfe8ee;--mut:#8fa1ad;--acc:#4fd1c5;--line:#2a3843;--on:#062a2a}}
+:root[data-theme="dark"]{--bg:#0f1418;--panel:#172027;--ink:#dfe8ee;--mut:#8fa1ad;--acc:#4fd1c5;--line:#2a3843;--on:#062a2a}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Avenir Next","Segoe UI",system-ui,sans-serif}
+header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;padding:14px 16px 0;max-width:1100px;margin:auto}
+h1{margin:0;font-size:26px;letter-spacing:-.5px}h2{margin:0 0 8px;font-size:16px}
+main{display:grid;gap:14px;padding:14px;max-width:1100px;margin:auto;grid-template-columns:1fr}
+@media(min-width:860px){main{grid-template-columns:1.3fr 1fr}}
+section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}.w{grid-column:1/-1}
+.m{color:var(--mut);font-size:13px}.row{display:flex;gap:16px;flex-wrap:wrap}.row>div{flex:1;min-width:200px}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:7px 12px}
+button:hover:not(:disabled){border-color:var(--acc)}button:disabled{opacity:.45;cursor:default}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.pri{background:var(--acc);color:var(--on);border-color:var(--acc);font-weight:600}
+.c{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:6px;color:#111;font:700 12px/22px system-ui;margin-right:2px;font-style:normal}
+.bar{height:6px;background:var(--line);border-radius:3px;margin-top:8px}.bar b{display:block;height:100%;width:0;background:var(--acc);border-radius:3px}
+.o,.u{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.u button{white-space:nowrap}.tk{padding:3px 9px;margin:0 4px 4px 0}
+svg{display:block;margin:8px 0}
+#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%;z-index:60}
+/* menu */
+.menu{min-height:100vh;min-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:24px 16px;text-align:center;--halo:var(--bg)}
+.logo{font-size:40px;letter-spacing:-1.5px;margin:0}
+.tag{margin:0 0 4px;color:var(--mut)}
+.badge{font-size:12px;font-weight:600;color:var(--acc);border:1px solid var(--acc);border-radius:999px;padding:3px 10px;margin:2px 0 0;letter-spacing:.4px}
+.menu-btns{display:flex;flex-direction:column;gap:10px;width:min(320px,90vw);margin:16px 0 8px}
+.big{padding:12px 16px;font-size:16px}
+.foot{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.foot button{padding:4px 10px;font-size:13px}
+.footnote{color:var(--mut);font-size:12px;margin-top:14px}
+#mb svg{animation:drop .5s ease}
+@keyframes drop{from{opacity:0;transform:translateY(6px)}}
+/* overlay */
+#ovl{position:fixed;inset:0;background:rgba(2,10,14,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:40}
+.sheet{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:12px;max-width:620px;width:100%;max-height:min(80dvh,640px);overflow:auto;padding:18px 20px;text-align:left}
+.sheet .x{position:absolute;top:10px;right:10px;padding:2px 10px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;font:600 12px system-ui;background:var(--bg)}
+.hit{color:var(--acc);font-weight:600;margin:6px 0}
+.keys{display:none}@media(hover:hover)and(pointer:fine){.keys{display:inline}}
+</style></head><body>
+<div id="scr-menu"></div>
+<div id="scr-game" hidden>
+<header><h1>Braid Works</h1><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div id="hud"></div><button class="tk" style="margin:0" data-a="menu">☰ Menu</button></div></header>
+<main id="app"></main></div>
+<div id="ovl" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+const $=id=>document.getElementById(id),COL=['#e5484d','#3fb950','#4c8dff','#f5c542'],NM='RGBY';
+const U=[['spd','Faster belts','Machines swap 15% quicker',40,1.7,10],['slot','Longer line','+1 machine slot',60,1.9,6],['line','Foreman','Auto-ships recipes you have solved',120,2,8],['ord','Order board','+1 open order',80,2.1,3],['val','Contract terms','+25% order payouts',100,1.8,10],['n4','Fourth strand','Adds ribbon Y and machine σ3. Clears line and board',600,1,1]];
+const Z=()=>({spd:0,slot:0,line:0,ord:0,val:0,n4:0});
+let S={m:0,tot:0,rt:0,co:0,up:Z(),rec:{},chain:[],orders:[],id:1,run:null,next:0,mute:0,theme:''};
+try{Object.assign(S,JSON.parse(localStorage.getItem('bw')||'{}'));S.up=Object.assign(Z(),S.up);if(!Array.isArray(S.chain))S.chain=[]}catch(e){}
+const fresh=()=>({m:0,tot:0,rt:0,co:0,up:Z(),rec:{},chain:[],orders:[],id:1,run:null,next:0,mute:S.mute,theme:S.theme});
+const N=()=>S.up.n4?4:3,MAXC=()=>4+S.up.slot,STEP=()=>900*Math.pow(.85,S.up.spd),MULT=()=>(1+.25*S.up.val)*(1+.1*S.co),OMAX=()=>3+S.up.ord;
+const fmt=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e4?(n/1e3).toFixed(1)+'k':Math.floor(n);
+const chips=s=>[...s].map(c=>`<i class="c" style="background:${COL[c]}">${NM[c]}</i>`).join('');
+const nm=s=>[...s].map(c=>NM[c]).join(''),wd=w=>w.map(g=>'σ'+(g+1)).join(' ');
+function apply(w,n){const a=[...Array(n).keys()];for(const g of w)[a[g],a[g+1]]=[a[g+1],a[g]];return a.join('')}
+function dist(n){const id=[...Array(n).keys()],d={[id.join('')]:0},q=[id];while(q.length){const p=q.shift(),dp=d[p.join('')];for(let g=0;g<n-1;g++){const x=p.slice();[x[g],x[g+1]]=[x[g+1],x[g]];const k=x.join('');if(!(k in d)){d[k]=dp+1;q.push(x)}}}return d}
+const D={3:dist(3),4:dist(4)};
+function braid(w,n){const X=k=>34+k*46,Y=s=>18+s*28;let pos=[...Array(n).keys()],sg=[],o='';
+for(let k=0;k<w.length;k++){const g=w[k],nx=pos.slice();[nx[g],nx[g+1]]=[nx[g+1],nx[g]];pos.forEach((c,s)=>{const s2=nx.indexOf(c);sg.push([c,X(k),Y(s),X(k+1),Y(s2),s2>s?1:0])});pos=nx}
+const W=X(w.length)+34,ln=(c,x1,y1,x2,y2,ov)=>{const m=(x1+x2)/2,d=`M${x1} ${y1}C${m} ${y1} ${m} ${y2} ${x2} ${y2}`;return(ov?`<path d="${d}" stroke="var(--halo,var(--panel))" stroke-width="11" fill="none"/>`:'')+`<path d="${d}" stroke="${COL[c]}" stroke-width="7" stroke-linecap="round" fill="none"/>`};
+for(let s=0;s<n;s++)o+=ln(s,0,Y(s),X(0),Y(s));
+pos.forEach((c,s)=>o+=ln(c,X(w.length),Y(s),W,Y(s)));
+sg.filter(x=>!x[5]).concat(sg.filter(x=>x[5])).forEach(x=>o+=ln(...x));
+return`<svg viewBox="0 0 ${W} ${Y(n-1)+14}" style="width:100%;max-width:${W*1.4}px" role="img" aria-label="braid diagram">${o}</svg>`}
+/* sound */
+let AC=null;addEventListener('pointerdown',()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume().catch(()=>{})}catch(_){}},{capture:true});
+const snd=(f,d=.08,t='sine',g=.05)=>{if(S.mute||!AC||AC.state!=='running')return;try{const o=AC.createOscillator(),v=AC.createGain();o.type=t;o.frequency.value=f;v.gain.setValueAtTime(g,AC.currentTime);v.gain.exponentialRampToValueAtTime(1e-4,AC.currentTime+d);o.connect(v);v.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(_){}};
+function gen(){const n=N(),d=D[n],lim=Math.min(n==3?3:6,MAXC(),1+Math.floor(Math.log2(1+S.tot/40)));
+const c=Object.keys(d).filter(k=>d[k]>0&&d[k]<=lim&&!S.orders.some(o=>o.t==k));if(!c.length)return;
+const t=c[Math.random()*c.length|0],dd=d[t];S.orders.push({id:S.id++,t,d:dd,pay:Math.round((10+14*Math.pow(dd,1.4))*MULT()),exp:Date.now()+(50+dd*18)*1000})}
+function fill(o,w,auto){S.orders=S.orders.filter(x=>x!==o);const par=w.length<=o.d,p=Math.round(o.pay*(auto?.7:par?1.5:1));S.m+=p;S.tot+=p;S.rt+=p;
+if(!auto){const r=S.rec[o.t];if(!r||w.length<r.length)S.rec[o.t]=w.slice();snd(660,.09,'triangle');setTimeout(()=>snd(990,.12,'triangle'),90);if(par)setTimeout(()=>snd(1320,.12,'triangle'),180)}else snd(587,.06,'triangle',.04);
+toast((auto?'Foreman shipped ':'Shipped ')+nm(o.t)+' +$'+p+(!auto&&par?' (par bonus)':''))}
+function done(){const r=S.run;S.run=null;const out=apply(r.w,N()),c=S.orders.filter(o=>o.t==out).sort((a,b)=>b.pay-a.pay)[0];
+if(c)fill(c,r.w,0);else{S.m+=1;snd(150,.18,'sawtooth',.03);toast('No order wants '+nm(out)+'. Scrapped for $1')}}
+let tt;function toast(s){const e=$('toast');e.textContent=s;e.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>e.style.opacity=0,2200)}
+function startRun(){if(S.run||!S.chain.length)return;const st=Date.now();S.run={w:S.chain.slice(),t0:st,end:st+S.chain.length*STEP()};snd(500,.05,'sine',.04);render()}
+/* ui state */
+const UI={view:'menu',modal:null};let arm=null,mi=null;
+const applyTheme=()=>{const r=document.documentElement;S.theme?r.dataset.theme=S.theme:r.removeAttribute('data-theme')};
+const hasSave=()=>S.tot>0||S.m>0||S.co>0||Object.keys(S.rec).length>0;
+const deco=()=>{const n=Math.random()<.5?3:4,w=[...Array(3+(Math.random()*4|0))].map(()=>Math.random()*(n-1)|0);return braid(w,n)};
+function renderMenu(){const hs=hasSave();
+ $('scr-menu').innerHTML=`<div class="menu">
+<div id="mb">${deco()}</div>
+<h1 class="logo">Braid Works</h1>
+<p class="tag">Braid anyons. Fill orders. Don't get tangled.</p>
+<p class="badge">Quantum Game Jam 2026</p>
+ ${hs?`<p class="m">$${fmt(S.m)} · coherence ${S.co} · ${Object.keys(S.rec).length} recipes · lifetime $${fmt(S.tot)}</p>`:''}
+<div class="menu-btns">
+ ${hs?`<button class="pri big" data-a="play">▶ Continue</button>`:''}
+<button class="${hs?'':'pri '}big" data-a="new">${hs?(arm==='new'?'Wipe and restart? Click again':'New game'):'▶ Play'}</button>
+<button class="big" data-a="how">How to play</button>
+<button class="big" data-a="sci">The physics</button>
+<button class="big" data-a="cred">Credits</button>
+</div>
+<div class="foot">
+<button data-a="mute">Sound: ${S.mute?'off':'on'}</button>
+<button data-a="theme">Theme: ${S.theme||'auto'}</button>
+ ${hs?`<button data-a="wipe">${arm==='wipe'?'Really wipe save?':'Reset save'}</button>`:''}
+</div>
+<p class="footnote">v1.2 · saves in this browser · nothing leaves your device</p>
+</div>`}
+function startMenu(){clearInterval(mi);UI.view='menu';arm=null;closeModal();$('scr-game').hidden=true;$('scr-menu').hidden=false;renderMenu();mi=setInterval(()=>{if(UI.view==='menu'){const el=$('mb');if(el)el.innerHTML=deco()}},2600)}
+function toGame(){clearInterval(mi);UI.view='game';arm=null;closeModal();$('scr-menu').hidden=true;$('scr-game').hidden=false;render()}
+function show(id){arm=null;UI.modal=id;const M={
+how:`<h2>How to play</h2><p><b>Goal:</b> braid strands into the order each contract wants, ship for cash, upgrade the workshop.</p>
+<ol><li><b>Read an order.</b> Colored chips are the bundle top→bottom (R G B = red on top). <span class="m">par N</span> is the fewest machines that can reach it.</li>
+<li><b>Build a line.</b> σ1 swaps strands 1–2, σ2 swaps 2–3. The diagram shows your line: chips enter left, exit right. Click a machine in your line to remove it.</li>
+<li><b>Ship.</b> A run takes 0.9s per machine. Match an order → full price. At or under par → ×1.5 bonus. No match → scrapped for $1.</li>
+<li><b>Save recipes.</b> Your first (shortest) build for a target is remembered — reload it anytime. The <b>Foreman</b> upgrade auto-ships saved recipes at 70%.</li>
+<li><b>Upgrade.</b> Faster belts, longer lines, more orders, better terms, and the <b>Fourth strand</b> (ribbon Y + σ3 — clears your line and board).</li>
+<li><b>Decoherence.</b> Prestige: reset money and upgrades for coherence (+10% payouts each, permanent). Recipes survive — measurement keeps the classical record.</li></ol>
+<p class="m keys">Keys — <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> add machine · <kbd>⌫</kbd> remove last · <kbd>⏎</kbd> ship · <kbd>Esc</kbd> close / menu.</p>`,
+sci:`<h2>The physics</h2>
+<p>In our 3-D world any tangle of particle paths can be untied — lift one loop over another. In a flat 2-D world there is no "over": exchange histories of planar particles are genuine braids. For <b>non-abelian anyons</b> each exchange applies a matrix to the quantum state, and matrices don't commute — so <b>order is everything</b>. σ1 then σ2 lands somewhere else than σ2 then σ1. Same machines, different product: the whole game.</p>
+<p>Braids obey the <b>Yang–Baxter relation</b>, σ1σ2σ1 = σ2σ1σ2. The game honors it: both three-machine lines turn R G B into B R G, so two different recipes tie for the same order.</p>
+<p><b>Topological quantum computation</b> uses exactly this: qubits live in the fusion spaces of anyons, and gates are performed by braiding. Since the information is stored in the topology of the paths — not in any local wiggle — it is naturally protected from noise.</p>
+<p><b>Par</b> is the Coxeter length of the target permutation: the true minimum number of adjacent swaps, computed by breadth-first search over S₃ and S₄.</p>
+<p>And <b>decoherence</b>? Real anyons leak quantum information to their environment. Here it's your prestige: collapse the workshop, keep the classical record (your recipes), rebuild stronger.</p>`,
+cred:`<h2>Credits</h2><p><b>Braid Works</b> — built for <b>Quantum Game Jam 2026</b>.</p>
+<ul class="m" style="line-height:1.9;padding-left:18px">
+<li>Design, code &amp; sound — [your team / names here]</li>
+<li>Physics — braid groups B₃/B₄, non-abelian anyons, topological quantum computing</li>
+<li>Audio — synthesized live with Web Audio, no samples</li>
+<li>Engine — one HTML file, zero dependencies, works offline</li>
+</ul><p class="m">Progress saves in your browser's localStorage. Nothing is uploaded anywhere.</p>`};
+ $('ovl').hidden=false;$('ovl').innerHTML=`<div class="sheet"><button class="x" data-a="close" aria-label="Close">✕</button>${M[id]}</div>`;const x=$('ovl').querySelector('.x');if(x)x.focus()}
+function closeModal(){UI.modal=null;$('ovl').hidden=true;$('ovl').innerHTML=''}
+ $('ovl').addEventListener('click',e=>{if(e.target.id==='ovl')closeModal()});
+function render(){const n=N(),w=S.chain,out=apply(w,n),id=[...Array(n).keys()].join(''),g=Math.floor(Math.sqrt(S.rt/500)),full=w.length>=MAXC();
+const match=S.orders.filter(o=>o.t===out).sort((a,b)=>b.pay-a.pay)[0];
+ $('hud').innerHTML=`<b>$${fmt(S.m)}</b> <span class="m">payout ×${MULT().toFixed(2)}${S.co?' · coherence '+S.co:''}</span>`;
+let h=`<section class="w"><h2>Why order matters <button class="tk" data-a="sci" style="float:right">The physics →</button></h2><div class="row"><div>σ1 then σ2${braid([0,1],3)}${chips('012')} → ${chips(apply([0,1],3))}</div><div>σ2 then σ1${braid([1,0],3)}${chips('012')} → ${chips(apply([1,0],3))}</div></div><p class="m">Same machines, same bundle, different product. Swaps don't commute, just like braided non-abelian anyons, where the order of exchanges changes the quantum state.</p></section>`;
+h+=`<section><h2>Your line <span class="m">${w.length}/${MAXC()} machines</span></h2>`;
+for(let i=0;i<n-1;i++)h+=`<button class="pri tk" data-a="add" data-v="${i}" ${full||S.run?'disabled':''}>σ${i+1}</button>`;
+h+=` <button data-a="clr" ${S.run?'disabled':''}>Clear</button><span class="m keys"> · keys 1–${n-1}, ⌫, ⏎</span><div style="margin-top:8px">${w.map((x,i)=>`<button class="tk" data-a="rm" data-v="${i}" ${S.run?'disabled':''}>σ${x+1}</button>`).join('')||'<span class="m">Add machines. Click one to remove it.</span>'}</div>`;
+h+=braid(w,n)+`<div>${chips(id)} → ${chips(out)}</div>${match?`<p class="hit">✓ Ready: matches an order — $${fmt(Math.round(match.pay*(w.length<=match.d?1.5:1)))}${w.length<=match.d?' with par bonus':''}</p>`:''}<div class="bar"><b id="rp"></b></div><p><button class="pri" data-a="ship" ${S.run||!w.length?'disabled':''}>Ship bundle</button> <span class="m">${(w.length*STEP()/1000).toFixed(1)}s run</span></p></section>`;
+h+=`<section><h2>Orders</h2>`+S.orders.map(o=>`<div class="o"><div>${chips(o.t)}<div class="m">par ${o.d} · $${o.pay} · <span data-e="${o.exp}"></span></div></div>${S.rec[o.t]?(S.rec[o.t].length<=MAXC()?`<button data-a="load" data-v="${o.t}" ${S.run?'disabled':''}>Load recipe</button>`:`<span class="m">recipe needs ${S.rec[o.t].length} slots</span>`):''}</div>`).join('')+`</section>`;
+h+=`<section><h2>Upgrades</h2>`+U.map(([k,t,d,c0,r,mx])=>{const lv=S.up[k],c=Math.round(c0*Math.pow(r,lv));return`<div class="u"><div>${t} <span class="m">${lv}/${mx}</span><div class="m">${d}</div></div><button data-a="buy" data-v="${k}" ${lv>=mx||S.m<c||S.run?'disabled':''}>${lv>=mx?'Maxed':'$'+fmt(c)}</button></div>`}).join('')+`<div class="u"><div>Decoherence<div class="m">Reset money and upgrades. Keep recipes. +10% payouts per point.</div></div><button data-a="pres" ${g<1||S.run?'disabled':''}>+${g} coherence</button></div></section>`;
+const rk=Object.keys(S.rec);h+=`<section class="w"><h2>Recipes <span class="m">${rk.length} solved</span></h2>`+(rk.map(t=>{const L=S.rec[t].length;return`<span style="display:inline-block;margin:0 14px 6px 0">${chips(t)} <span class="m">${wd(S.rec[t])}${L>MAXC()?` · needs ${L} slots`:''}</span></span>`}).join('')||'<span class="m">Ship a matching order to save its recipe. The Foreman reuses them.</span>')+`</section>`;
+ $('app').innerHTML=h;try{localStorage.setItem('bw',JSON.stringify({m:S.m,tot:S.tot,rt:S.rt,co:S.co,up:S.up,rec:S.rec,chain:S.chain,mute:S.mute,theme:S.theme,next:S.next}))}catch(e){}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,v=b.dataset.v;
+if(a==='play')toGame();
+else if(a==='menu'&&!S.run)startMenu();
+else if(a==='how'||a==='sci'||a==='cred'){show(a);return}
+else if(a==='close'){closeModal();return}
+else if(a==='mute'){S.mute^=1;if(UI.view==='menu')renderMenu()}
+else if(a==='theme'){S.theme=S.theme==='dark'?'':S.theme==='light'?'dark':'light';applyTheme();if(UI.view==='menu')renderMenu()}
+else if(a==='new'){if(hasSave()&&arm!=='new'){arm='new';renderMenu()}else{Object.assign(S,fresh());toGame()}}
+else if(a==='wipe'){if(arm==='wipe'){arm=null;try{localStorage.removeItem('bw')}catch(_){ }Object.assign(S,fresh());renderMenu();toast('Save wiped')}else{arm='wipe';renderMenu()}}
+else if(a==='add'&&!S.run&&S.chain.length<MAXC()){S.chain.push(+v);snd(440+S.chain.length*66,.06,'triangle')}
+else if(a==='rm'&&!S.run){S.chain.splice(+v,1);snd(294,.06,'triangle')}
+else if(a==='clr'&&!S.run){S.chain=[];snd(220,.09,'triangle')}
+else if(a==='load'&&!S.run&&S.rec[v]&&S.rec[v].length<=MAXC()){S.chain=S.rec[v].slice();snd(520,.05,'sine',.03)}
+else if(a==='ship')startRun();
+else if(a==='buy'&&!S.run){const u=U.find(x=>x[0]==v),c=Math.round(u[3]*Math.pow(u[4],S.up[v]));if(S.up[v]<u[5]&&S.m>=c){S.m-=c;S.up[v]++;snd(784,.08,'square',.03);if(v==='n4'){S.chain=[];S.orders=[];S.run=null;snd(659,.1,'triangle');setTimeout(()=>snd(880,.14,'triangle'),100)}}}
+else if(a==='pres'&&!S.run){const g=Math.floor(Math.sqrt(S.rt/500));if(g>=1){S.co+=g;S.m=0;S.rt=0;S.up=Z();S.chain=[];S.orders=[];S.run=null;snd(392,.08,'triangle');setTimeout(()=>snd(523,.08,'triangle'),90);setTimeout(()=>snd(659,.14,'triangle'),180)}}
+if(UI.view==='game')render()});
+addEventListener('keydown',e=>{
+if(UI.modal){if(e.key==='Escape')closeModal();return}
+if(UI.view!=='game')return;
+if(e.key==='Escape'&&!S.run){startMenu();return}
+if(S.run)return;
+const tag=document.activeElement&&document.activeElement.tagName;
+if(e.key>='1'&&e.key<='4'){const i=+e.key-1;if(i<N()-1&&S.chain.length<MAXC()){S.chain.push(i);snd(440+S.chain.length*66,.06,'triangle');render()}}
+else if(e.key==='Backspace'){e.preventDefault();if(S.chain.length){S.chain.pop();snd(294,.06,'triangle');render()}}
+else if(e.key==='Enter'&&tag!=='BUTTON')startRun()});
+function tick(){if(UI.view!=='game')return;const t=Date.now();let ch=0;
+if(S.run){if(t>=S.run.end){done();ch=1}else{const p=$('rp');if(p)p.style.width=(t-S.run.t0)/(S.run.end-S.run.t0)*100+'%'}}
+const l=S.orders.length;S.orders=S.orders.filter(o=>o.exp>t);if(S.orders.length!=l)ch=1;
+while(S.orders.length<OMAX()){const c=S.orders.length;gen();if(S.orders.length==c)break;ch=1}
+if(S.up.line&&t>=S.next){S.next=t+Math.max(1200,9000*Math.pow(.9,S.up.spd)/S.up.line);const o=S.orders.filter(o=>S.rec[o.t]).sort((a,b)=>b.pay-a.pay)[0];if(o){fill(o,S.rec[o.t],1);ch=1}}
+if(ch)render();else document.querySelectorAll('[data-e]').forEach(e=>e.textContent=Math.max(0,Math.ceil((e.dataset.e-t)/1000))+'s')}
+applyTheme();startMenu();setInterval(tick,200);
+</script></body></html>
